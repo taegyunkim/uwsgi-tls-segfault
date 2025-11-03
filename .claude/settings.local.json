@@ -3,7 +3,9 @@
     "allow": [
       "Bash(python:*)",
       "Bash(pip install:*)",
-      "Bash(echo \"Exit code: $?\")"
+      "Bash(echo \"Exit code: $?\")",
+      "Bash(TEST_MODULE=cpp python test_segfault.py)",
+      "Bash(TEST_MODULE=rust python test_segfault.py)"
     ],
     "deny": []
   }

@@ -4,6 +4,7 @@ Test script to demonstrate TLS destruction segfaults at exit time.
 """
 
 import atexit
+import os
 import sys
 
 
@@ -46,7 +47,8 @@ def test_rust_module():
 print("TLS Atexit Segfault Demonstration")
 print("=" * 40)
 
-module = sys.argv[1] if len(sys.argv) > 1 else "both"
+# Check TEST_MODULE environment variable, default to "cpp"
+module = os.environ.get("TEST_MODULE", "cpp")
 
 if module in ["cpp", "both"]:
     test_cpp_module()
@@ -61,7 +63,3 @@ print("before atexit handlers run, causing access to freed memory.")
 
 def application():
     pass
-
-
-if __name__ == "__main__":
-    application()
