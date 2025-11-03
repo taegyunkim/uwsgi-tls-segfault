@@ -48,7 +48,7 @@ def test_rust_module():
         print("Build with: python setup.py build_ext --inplace")
 
 
-if __name__ == "__main__":
+def application():
     print("TLS Atexit Segfault Demonstration")
     print("=" * 40)
 
@@ -63,3 +63,7 @@ if __name__ == "__main__":
     print("\nExiting... (segfault may occur here)")
     print("The segfault happens because TLS objects are destroyed")
     print("before atexit handlers run, causing access to freed memory.")
+
+
+if __name__ == "__main__":
+    application()
