@@ -1,18 +1,20 @@
 # uwsgi-tls-segfault
 
-A demonstration of Thread Local Storage (TLS) destruction timing issues that cause segmentation faults in uWSGI environments.
+A demonstration of Thread Local Storage (TLS) destruction ordering differences between standalone Python and uWSGI environments.
 
 ## Overview
 
-This repository demonstrates a critical timing issue between Thread Local Storage (TLS) destruction and Python's `atexit` handlers in uWSGI deployments. While the code runs safely in standalone Python scripts, it segfaults when executed under uWSGI due to differences in process lifecycle management.
+This repository demonstrates a critical difference in TLS destruction and Python `atexit` handler execution between standalone Python and uWSGI deployments. The ordering is well-defined in both cases, but differs significantly, leading to segmentation faults under uWSGI.
 
 ## The Problem
 
-- **Standalone Python**: TLS objects are destroyed during normal interpreter shutdown, and atexit handlers may not execute reliably
-- **uWSGI Environment**: Worker processes are forcibly terminated, creating a race condition where:
-  1. `atexit` handlers are called during `Py_FinalizeEx()` 
-  2. TLS objects are destroyed before/during atexit handler execution
-  3. Atexit handlers attempt to access already-freed TLS memory → **SEGFAULT**
+The issue stems from different execution contexts having different destruction orders:
+
+- **Standalone Python**: During normal `exit()` syscall, `Py_Finalize()` is called first, which properly executes `atexit` handlers before TLS storage is destroyed by the system
+- **uWSGI Environment**: Worker processes have a different destruction sequence where:
+  1. TLS objects are destroyed as part of thread/process cleanup
+  2. `atexit` handlers are called later during Python interpreter finalization
+  3. Atexit handlers attempt to access already-destroyed TLS memory → **SEGFAULT**
 
 ## Language Comparison
 
@@ -77,4 +79,4 @@ cpp_tls_atexit.cpython-312-x86_64-linux-gnu.so(+0x12c4)
 
 This corresponds to the `atexit_handler` function attempting to dereference the invalid pointer (`0xdeadbeef`) after TLS cleanup has occurred.
 
-The call chain shows: `uwsgi_plugins_atexit` → `Py_FinalizeEx` → atexit handlers, confirming this happens during uWSGI's controlled shutdown process.
+The call chain shows: `uwsgi_plugins_atexit` → `Py_FinalizeEx` → atexit handlers, confirming this happens during uWSGI's controlled shutdown process where TLS has already been destroyed but Python atexit handlers are still being executed.
