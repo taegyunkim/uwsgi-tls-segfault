@@ -18,9 +18,6 @@ def test_cpp_module():
         # Register the atexit handler that will access the freed TLS object
         atexit.register(cpp_tls_atexit.atexit_handler)
 
-        # Register cleanup to happen first (atexit handlers run in LIFO order)
-        atexit.register(cpp_tls_atexit.force_cleanup)
-
         print("C++ module: TLS initialized and atexit handler registered")
 
     except ImportError as e:
@@ -39,8 +36,6 @@ def test_rust_module():
         # Register the atexit handler that will access the freed TLS object
         atexit.register(rust_tls_atexit.atexit_handler)
 
-        # Register cleanup to happen first (atexit handlers run in LIFO order)
-        atexit.register(rust_tls_atexit.force_cleanup)
         print("Rust module: TLS initialized and atexit handler registered")
 
     except ImportError as e:
@@ -48,21 +43,24 @@ def test_rust_module():
         print("Build with: python setup.py build_ext --inplace")
 
 
+print("TLS Atexit Segfault Demonstration")
+print("=" * 40)
+
+module = sys.argv[1] if len(sys.argv) > 1 else "both"
+
+if module in ["cpp", "both"]:
+    test_cpp_module()
+
+if module in ["rust", "both"]:
+    test_rust_module()
+
+print("\nExiting... (segfault may occur here)")
+print("The segfault happens because TLS objects are destroyed")
+print("before atexit handlers run, causing access to freed memory.")
+
+
 def application():
-    print("TLS Atexit Segfault Demonstration")
-    print("=" * 40)
-
-    module = sys.argv[1] if len(sys.argv) > 1 else "both"
-
-    if module in ["cpp", "both"]:
-        test_cpp_module()
-
-    if module in ["rust", "both"]:
-        test_rust_module()
-
-    print("\nExiting... (segfault may occur here)")
-    print("The segfault happens because TLS objects are destroyed")
-    print("before atexit handlers run, causing access to freed memory.")
+    pass
 
 
 if __name__ == "__main__":
