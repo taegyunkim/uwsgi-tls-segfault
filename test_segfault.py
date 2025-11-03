@@ -5,7 +5,6 @@ Test script to demonstrate TLS destruction segfaults at exit time.
 
 import atexit
 import os
-import sys
 
 
 def test_cpp_module():
