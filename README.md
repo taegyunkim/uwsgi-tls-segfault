@@ -10,7 +10,7 @@ This repository demonstrates a critical difference in TLS destruction and Python
 
 The issue stems from different execution contexts having different destruction orders:
 
-- **Standalone Python**: During normal `exit()` syscall, `Py_Finalize()` is called first, which properly executes `atexit` handlers before TLS storage is destroyed by the system
+- **Standalone Python**: `atexit` handlers are run first and TLS is destroyed. No segmentation fault. 
 - **uWSGI Environment**: Worker processes have a different destruction sequence where:
   1. TLS objects are destroyed as part of thread/process cleanup
   2. `atexit` handlers are called later during Python interpreter finalization
