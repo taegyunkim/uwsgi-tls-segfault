@@ -49,11 +49,12 @@ print("=" * 40)
 # Check TEST_MODULE environment variable, default to "cpp"
 module = os.environ.get("TEST_MODULE", "cpp")
 
-if module in ["cpp", "both"]:
+if module == 'cpp':
     test_cpp_module()
-
-if module in ["rust", "both"]:
+elif module == 'rust':
     test_rust_module()
+else:
+    print("Unsupported TEST_MODULE")
 
 print("\nExiting... (segfault may occur here)")
 print("The segfault happens because TLS objects are destroyed")
