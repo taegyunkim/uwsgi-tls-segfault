@@ -15,7 +15,7 @@ def test_cpp_module():
         # Initialize TLS object
         cpp_tls_atexit.initialize_tls()
 
-        # Register the atexit handler that will access the freed TLS object
+        # Register the atexit handler that will access the TLS object
         atexit.register(cpp_tls_atexit.atexit_handler)
 
         print("C++ module: TLS initialized and atexit handler registered")
@@ -33,7 +33,7 @@ def test_rust_module():
         # Initialize TLS object
         rust_tls_atexit.initialize_tls()
 
-        # Register the atexit handler that will access the freed TLS object
+        # Register the atexit handler that will access the TLS object
         atexit.register(rust_tls_atexit.atexit_handler)
 
         print("Rust module: TLS initialized and atexit handler registered")
