@@ -35,9 +35,6 @@ python test_segfault.py
 
 # Test Rust module  
 TEST_MODULE=rust python test_segfault.py
-
-# Test both modules
-TEST_MODULE=both python test_segfault.py
 ```
 
 ### Standalone Testing (Safe)
